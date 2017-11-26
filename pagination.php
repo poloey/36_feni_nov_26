@@ -1,14 +1,23 @@
 <?php
-
-$sql = 'select * from people';
-if (isset($_GET['nizam'])) {
-  $q = $_GET['nizam'];
-  $sql = "select * from people where name like '%$q%' or email like '%$q%' ";
+$post_per_page = 3;
+$offset = 0;
+$page = 1;
+if (isset($_GET['page'])) {
+  $page = $_GET['page'];
+  $offset = $page * $post_per_page - $post_per_page;
 }
+$sql = "select * from people limit $post_per_page offset $offset ";
 $connection = new PDO('mysql:dbname=feni;host=localhost', 'root', '');
 $statement = $connection->prepare($sql);
 $statement->execute();
+
+
+$statement2 = $connection->query('select * from people');
+$statement2->execute();
+$total = $statement2->rowCount();
+
 $people = $statement->fetchAll(PDO::FETCH_OBJ);
+$total_page = ceil($total / $post_per_page) ;
 
 ?>
 <!DOCTYPE html>
@@ -30,14 +39,6 @@ $people = $statement->fetchAll(PDO::FETCH_OBJ);
       </h2>
     </div>
     <div class="row">
-      <div class="col-md-4 mx-auto mt-4">
-        <form action="" method="get">
-          <div class="input-group">
-            <input name="nizam" type="text" class="form-control">
-            <button type="submit" class="input-group-addon">search</button>
-          </div>
-        </form>
-      </div>
     </div>
     <div class="card-body">
       <?php if (count($people)): ?>
@@ -55,6 +56,15 @@ $people = $statement->fetchAll(PDO::FETCH_OBJ);
           </tr>
         <?php endforeach; ?>
       </table>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class="page-item <?php echo $page < 2 ? 'disabled' : '' ?>"><a class="page-link" href="/?page=<?= $page - 1 ?>">Previous</a></li>
+          <?php for($i = 1; $i <= $total_page; $i++): ?>
+            <li class="page-item <?php echo $page == $i ? 'active': ''  ?>"><a class="page-link" href="/?page=<?= $i ?>"><?= $i ?></a></li>
+          <?php endfor; ?>
+          <li class="page-item <?php echo $page > 3 ? 'disabled': '' ?> "><a class="page-link" href="/?page=<?= $page + 1 ?>">Next</a></li>
+        </ul>
+      </nav>
       <?php else: ?>
       <h2>NO result found</h2>
       <?php endif; ?>
