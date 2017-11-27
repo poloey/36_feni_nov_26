@@ -12,7 +12,7 @@ $statement = $connection->prepare($sql);
 $statement->execute();
 
 
-$statement2 = $connection->query('select * from people');
+$statement2 = $connection->prepare('select * from people');
 $statement2->execute();
 $total = $statement2->rowCount();
 
@@ -62,7 +62,7 @@ $total_page = ceil($total / $post_per_page) ;
           <?php for($i = 1; $i <= $total_page; $i++): ?>
             <li class="page-item <?php echo $page == $i ? 'active': ''  ?>"><a class="page-link" href="/?page=<?= $i ?>"><?= $i ?></a></li>
           <?php endfor; ?>
-          <li class="page-item <?php echo $page > 3 ? 'disabled': '' ?> "><a class="page-link" href="/?page=<?= $page + 1 ?>">Next</a></li>
+          <li class="page-item <?php echo $page > $total_page - 1 ? 'disabled': '' ?> "><a class="page-link" href="/?page=<?= $page + 1 ?>">Next</a></li>
         </ul>
       </nav>
       <?php else: ?>
