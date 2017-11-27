@@ -1,3 +1,5 @@
+create database feni;
+use feni;
 create table people (
   id int(11) primary key auto_increment,
   name varchar(30),
